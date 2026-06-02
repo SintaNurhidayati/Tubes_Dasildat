@@ -1,8 +1,8 @@
 <?php
-function predictDiabetes($features)
+function predictDiabetes5Fitur($features)
 {
     // Path ke script Python
-    $pythonScript = "C:/xampp/htdocs/TUGAS_DIABETES_PREDICTION/scripts/e-nose.py";
+    $pythonScript = "C:/xampp/htdocs/TUGAS_DIABETES_PREDICTION/scripts/e-nose_5fitur.py";
 
     // Konversi features ke JSON
     $inputJson = json_encode($features);
@@ -20,51 +20,51 @@ function predictDiabetes($features)
     return $result;
 }
 
-// Data test cases
 $test_cases = [
     [
         'name' => 'Pasien Risiko Tinggi Diabetes',
-        'features' => [6, 148, 72, 35, 0, 33.6, 0.627, 50]
+        'features' => [148, 33.6, 50, 6, 0.627]
     ],
     [
         'name' => 'Pasien Sehat (Normal)',
-        'features' => [1, 85, 66, 29, 0, 26.6, 0.351, 31]
+        'features' => [85, 26.6, 31, 1, 0.351]
     ],
     [
         'name' => 'Pasien Risiko Tinggi (Kasus 2)',
-        'features' => [8, 183, 64, 0, 0, 23.3, 0.672, 32]
+        'features' => [183, 23.3, 32, 8, 0.672]
     ],
     [
         'name' => 'Pasien Muda Sehat',
-        'features' => [0, 89, 66, 23, 94, 28.1, 0.167, 21]
+        'features' => [89, 28.1, 21, 0, 0.167]
     ],
     [
         'name' => 'Pasien dengan BMI Tinggi',
-        'features' => [3, 120, 80, 30, 50, 35.0, 0.500, 45]
+        'features' => [120, 35.0, 45, 3, 0.500]
     ],
     [
         'name' => 'Pasien Usia Lanjut',
-        'features' => [5, 130, 75, 28, 0, 32.0, 0.800, 65]
+        'features' => [130, 32.0, 65, 5, 0.800]
     ]
 ];
 
 // Lakukan prediksi untuk semua test cases
 $results = [];
 foreach ($test_cases as $case) {
-    $result = predictDiabetes($case['features']);
+    $result = predictDiabetes5Fitur($case['features']);
     $results[] = [
         'name' => $case['name'],
         'features' => $case['features'],
         'class' => isset($result['class']) ? $result['class'] : 'Error'
     ];
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
-    <title>Coba Machine Learning - Prediksi Diabetes</title>
+    <title>Coba Machine Learning - 5 Fitur Terbaik</title>
     <style>
         body {
             font-family: Arial;
@@ -155,7 +155,7 @@ foreach ($test_cases as $case) {
                 <tr>
                     <th>No</th>
                     <th>Skenario</th>
-                    <th>Data (8 Fitur)</th>
+                    <th>Data (Glucose, BMI, Age, Pregnancies, Pedigree)</th>
                     <th>Hasil Prediksi</th>
                 </tr>
             </thead>
@@ -171,14 +171,14 @@ foreach ($test_cases as $case) {
             </tbody>
         </table>
 
-        <a href="panggil_machine_learning.php" class="btn-back">Kembali ke Form Prediksi</a>
+        <div class="btn-group">
+            <a href="panggil_5fitur.php" class="btn-back">Kembali ke Form Prediksi</a>
+        </div>
 
         <div class="info">
-            <strong>📊 Informasi Model:</strong><br>
-            • Dataset: Pima Indians Diabetes Database (768 sampel)<br>
-            • Fitur: 8 parameter medis<br>
+            <strong>📊 Informasi Model 5 Fitur:</strong><br>
             • Algoritma: SVM (Support Vector Machine)<br>
-            • Akurasi: ~77%<br>
+            • Fitur: 5 terbaik dari seleksi fitur (F-Score)<br>
             • Total test cases: <?php echo count($results); ?> skenario<br>
             • Hasil prediksi ditampilkan dalam tabel untuk perbandingan
         </div>

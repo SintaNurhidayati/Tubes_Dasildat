@@ -1,49 +1,24 @@
 <?php
-
 function predictDiabetes($features)
 {
-    // Path ke script Python
-    $pythonScript = "C:/xampp/htdocs/TUGAS_DIABETES_PREDICTION/scripts/e-nose.py";
-
-    // Konversi features ke JSON
+    $pythonScript = "C:/xampp/htdocs/TUGAS_DIABETES_PREDICTION/scripts/e-nose_5fitur.py";
     $inputJson = json_encode($features);
-
-    // Jalankan Python
     $command = "python \"$pythonScript\" \"$inputJson\" 2>&1";
     $output = shell_exec($command);
-
-    // Bersihkan output
     $output = trim($output);
-
-    // Parse JSON
-    $result = json_decode($output, true);
-
-    return $result;
+    return json_decode($output, true);
 }
 
 $result = null;
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Ambil data dari form
-    $pregnancies = str_replace(',', '.', $_POST['pregnancies']);
-    $glucose = str_replace(',', '.', $_POST['glucose']);
-    $blood_pressure = str_replace(',', '.', $_POST['blood_pressure']);
-    $skin_thickness = str_replace(',', '.', $_POST['skin_thickness']);
-    $insulin = str_replace(',', '.', $_POST['insulin']);
-    $bmi = str_replace(',', '.', $_POST['bmi']);
-    $diabetes_pedigree = str_replace(',', '.', $_POST['diabetes_pedigree']);
-    $age = str_replace(',', '.', $_POST['age']);
-
     $features = [
-        (float)$pregnancies,
-        (float)$glucose,
-        (float)$blood_pressure,
-        (float)$skin_thickness,
-        (float)$insulin,
-        (float)$bmi,
-        (float)$diabetes_pedigree,
-        (float)$age
+        (float) str_replace(',', '.', $_POST['glucose']),
+        (float) str_replace(',', '.', $_POST['bmi']),
+        (float) str_replace(',', '.', $_POST['age']),
+        (float) str_replace(',', '.', $_POST['pregnancies']),
+        (float) str_replace(',', '.', $_POST['pedigree'])
     ];
 
     $result = predictDiabetes($features);
@@ -59,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <head>
     <meta charset="UTF-8">
-    <title>Prediksi Diabetes</title>
+    <title>Prediksi Diabetes - 5 Fitur Terbaik</title>
     <style>
         body {
             font-family: Arial;
@@ -198,56 +173,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="container">
         <h1>🩺 Prediksi Diabetes</h1>
-        <div class="subtitle">Masukkan data pasien untuk prediksi (8 Fitur)</div>
+        <div class="subtitle">Menggunakan 5 Fitur Terbaik (Hasil Seleksi Fitur)</div>
 
         <form method="POST">
             <div class="form-group">
-                <label>Jumlah Kehamilan (Pregnancies)</label>
-                <input type="number" step="any" name="pregnancies" 
-                       value="<?php echo isset($_POST['pregnancies']) ? htmlspecialchars($_POST['pregnancies']) : '6'; ?>" required>
-            </div>
-            <div class="form-group">
                 <label>Kadar Glukosa</label>
-                <input type="number" step="any" name="glucose" 
-                       value="<?php echo isset($_POST['glucose']) ? htmlspecialchars($_POST['glucose']) : '148'; ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Tekanan Darah (Blood Pressure)</label>
-                <input type="number" step="any" name="blood_pressure" 
-                       value="<?php echo isset($_POST['blood_pressure']) ? htmlspecialchars($_POST['blood_pressure']) : '72'; ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Ketebalan Kulit (Skin Thickness)</label>
-                <input type="number" step="any" name="skin_thickness" 
-                       value="<?php echo isset($_POST['skin_thickness']) ? htmlspecialchars($_POST['skin_thickness']) : '35'; ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Insulin</label>
-                <input type="number" step="any" name="insulin" 
-                       value="<?php echo isset($_POST['insulin']) ? htmlspecialchars($_POST['insulin']) : '0'; ?>" required>
+                <input type="number" step="any" name="glucose"
+                    value="<?php echo isset($_POST['glucose']) ? htmlspecialchars($_POST['glucose']) : '148'; ?>" required>
             </div>
             <div class="form-group">
                 <label>BMI</label>
-                <input type="number" step="any" name="bmi" 
-                       value="<?php echo isset($_POST['bmi']) ? htmlspecialchars($_POST['bmi']) : '33.6'; ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Diabetes Pedigree</label>
-                <input type="number" step="any" name="diabetes_pedigree" 
-                       value="<?php echo isset($_POST['diabetes_pedigree']) ? htmlspecialchars($_POST['diabetes_pedigree']) : '0.627'; ?>" required>
+                <input type="number" step="any" name="bmi"
+                    value="<?php echo isset($_POST['bmi']) ? htmlspecialchars($_POST['bmi']) : '33.6'; ?>" required>
             </div>
             <div class="form-group">
                 <label>Usia</label>
-                <input type="number" step="any" name="age" 
-                       value="<?php echo isset($_POST['age']) ? htmlspecialchars($_POST['age']) : '50'; ?>" required>
+                <input type="number" step="any" name="age"
+                    value="<?php echo isset($_POST['age']) ? htmlspecialchars($_POST['age']) : '50'; ?>" required>
             </div>
-            <button type="submit">🔍 Prediksi Sekarang</button>
+            <div class="form-group">
+                <label>Jumlah Kehamilan (Pregnancies)</label>
+                <input type="number" step="any" name="pregnancies"
+                    value="<?php echo isset($_POST['pregnancies']) ? htmlspecialchars($_POST['pregnancies']) : '6'; ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Diabetes Pedigree</label>
+                <input type="number" step="any" name="pedigree"
+                    value="<?php echo isset($_POST['pedigree']) ? htmlspecialchars($_POST['pedigree']) : '0.627'; ?>" required>
+            </div>
+            <button type="submit">🔍 Prediksi</button>
         </form>
 
         <?php if ($error): ?>
-            <div class="error">
-                <strong>⚠️ Error:</strong><br><?php echo htmlspecialchars($error); ?>
-            </div>
+            <div class="error"><strong>Error:</strong><br><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <?php if ($result && isset($result['class'])): ?>
@@ -258,14 +216,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div class="info">
             <strong>Informasi:</strong><br>
-            Dataset: Pima Indians Diabetes Database (768 sampel)<br>
-            Fitur: 8 parameter medis<br>
-            Hasil ini bersifat prediksi, untuk lebih lanjut silahkan konsultasikan dengan dokter untuk diagnosis pasti.
+            Algoritma: SVM (Support Vector Machine)<br>
+            Fitur: 5 terbaik (Glucose, BMI, Age, Pregnancies, Pedigree)<br>
+            Hasil seleksi fitur berdasarkan F-Score
         </div>
 
         <div class="nav">
-            <a href="coba_machine_learning.php">🧪 Test Cases </a>
-            <a href="panggil_5fitur.php">🔁 Gunakan 5 Fitur Terbaik </a>
+            <a href="coba_machine_learning_5fitur.php">🧪 Coba Test Cases </a>
+            <a href="panggil_machine_learning.php">🔁 Kembali ke 8 Fitur </a>
         </div>
     </div>
 </body>
